@@ -1,1 +1,1 @@
-# NFT-starter
+# NFT starter

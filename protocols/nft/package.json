@@ -1,0 +1,19 @@
+{
+  "name": "@nft-starter/contracts",
+  "scripts": {
+    "lint": "eslint \"{scripts,test}/**/*.ts\" --fix"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
+    "@nomicfoundation/hardhat-viem": "^1.0.2",
+    "@types/chai": "^4.3.11",
+    "@types/chai-as-promised": "^7.1.8",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "hardhat": "^2.19.3",
+    "typescript": "^5.3.3",
+    "viem": "^1.21.0"
+  }
+}
