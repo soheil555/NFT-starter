@@ -1,11 +1,14 @@
 {
-  "name": "@nft-starter/contracts",
+  "name": "@fibonart/contracts",
   "scripts": {
     "lint": "eslint \"{scripts,test}/**/*.ts\" --fix"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.13.1",
+    "@nomicfoundation/hardhat-ignition-viem": "^0.13.1",
     "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
     "@nomicfoundation/hardhat-viem": "^1.0.2",
+    "@openzeppelin/contracts": "^5.0.1",
     "@types/chai": "^4.3.11",
     "@types/chai-as-promised": "^7.1.8",
     "@typescript-eslint/eslint-plugin": "^6.16.0",

@@ -1,21 +1,12 @@
 import hre from 'hardhat'
-import { formatEther, parseEther } from 'viem'
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000)
-  const unlockTime = BigInt(currentTimestampInSeconds + 60)
+  const svg = `<svg xlmns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" /></svg>`
+  const nft = await hre.viem.deployContract('NFT')
 
-  const lockedAmount = parseEther('0.001')
+  const base64 = await nft.read.formatTokenURI([svg])
 
-  const lock = await hre.viem.deployContract('Lock', [unlockTime], {
-    value: lockedAmount,
-  })
-
-  console.log(
-    `Lock with ${formatEther(
-      lockedAmount,
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`,
-  )
+  console.log(base64)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
