@@ -4,12 +4,22 @@ pragma solidity ^0.8.19;
 import {ERC721URIStorage} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import {ERC721} from '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import {Base64} from '@openzeppelin/contracts/utils/Base64.sol';
+import {Strings} from '@openzeppelin/contracts/utils/Strings.sol';
+import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {VRFV2WrapperConsumerBase} from '@chainlink/contracts/src/v0.8/vrf/VRFV2WrapperConsumerBase.sol';
 
-contract NFT is ERC721URIStorage {
+contract NFT is ERC721URIStorage, VRFV2WrapperConsumerBase, Ownable {
     uint256 private _nextTokenId;
     event CreatedNTF(uint256 indexed tokenId, string tokenURI);
 
-    constructor() ERC721('NFT', 'NFT') {}
+    constructor(
+        address _link,
+        address _vrfV2Wrapper
+    )
+        ERC721('NFT', 'NFT')
+        VRFV2WrapperConsumerBase(_link, _vrfV2Wrapper)
+        Ownable(msg.sender)
+    {}
 
     function create(string memory _svg) public {
         _safeMint(msg.sender, _nextTokenId);
@@ -42,4 +52,9 @@ contract NFT is ERC721URIStorage {
             )
         );
     }
+
+    function fulfillRandomWords(
+        uint256 _requestId,
+        uint256[] memory _randomWords
+    ) internal override {}
 }

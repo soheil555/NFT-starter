@@ -4,6 +4,7 @@
     "lint": "eslint \"{scripts,test}/**/*.ts\" --fix"
   },
   "devDependencies": {
+    "@chainlink/contracts": "^0.8.0",
     "@nomicfoundation/hardhat-ignition": "^0.13.1",
     "@nomicfoundation/hardhat-ignition-viem": "^0.13.1",
     "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
