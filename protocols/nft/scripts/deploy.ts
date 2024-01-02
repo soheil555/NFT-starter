@@ -1,3 +1,4 @@
+import { EventLog } from 'ethers'
 import { ethers } from 'hardhat'
 
 async function main() {
@@ -58,10 +59,10 @@ async function main() {
 
   await linkToken.transfer(nftAddress, '10000000000000000000')
 
-  tx = await nft.create()
-  await tx.wait()
+  tx = await nft.requestMint()
+  const receipt = await tx.wait()
 
-  const requestId = await nft.lastRequestId()
+  const { requestId, tokenId } = (receipt?.logs[3] as EventLog).args
 
   tx = await vrfCoordinatorV2Mock.fulfillRandomWords(
     requestId,
@@ -69,9 +70,16 @@ async function main() {
   )
   await tx.wait()
 
-  const result = await nft.getRequestStatus(requestId)
+  tx = await nft.setTokenURI(tokenId)
+  await tx.wait()
 
-  console.log(result)
+  const tokenURI = await nft.tokenURI(tokenId)
+
+  console.log({
+    requestId,
+    tokenId,
+    tokenURI,
+  })
 }
 
 // We recommend this pattern to be able to use async/await everywhere
