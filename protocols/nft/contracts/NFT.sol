@@ -9,8 +9,26 @@ import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {VRFV2WrapperConsumerBase} from '@chainlink/contracts/src/v0.8/vrf/VRFV2WrapperConsumerBase.sol';
 
 contract NFT is ERC721URIStorage, VRFV2WrapperConsumerBase, Ownable {
-    uint256 private _nextTokenId;
-    event CreatedNTF(uint256 indexed tokenId, string tokenURI);
+    event RequestSent(uint256 requestId, uint32 numWords);
+    event RequestFulfilled(
+        uint256 requestId,
+        uint256[] randomWords,
+        uint256 payment
+    );
+
+    uint256 private _nextTokenId = 0;
+    uint32 private callbackGasLimit = 300000;
+    uint8 private requestConfirmations = 3;
+    uint8 private numRandomWords = 1;
+    uint256[] public requestIds;
+    uint256 public lastRequestId;
+
+    struct RequestStatus {
+        uint256 paid;
+        bool fulfilled;
+        uint256[] randomWords;
+    }
+    mapping(uint256 => RequestStatus) public s_requests;
 
     constructor(
         address _link,
@@ -21,14 +39,48 @@ contract NFT is ERC721URIStorage, VRFV2WrapperConsumerBase, Ownable {
         Ownable(msg.sender)
     {}
 
-    function create(string memory _svg) public {
-        _safeMint(msg.sender, _nextTokenId);
-        string memory tokenURI = formatTokenURI(_svg);
-        _setTokenURI(_nextTokenId, tokenURI);
+    function create() public {
+        uint256 requestId = requestRandomness(
+            callbackGasLimit,
+            requestConfirmations,
+            numRandomWords
+        );
 
-        emit CreatedNTF(_nextTokenId, tokenURI);
+        s_requests[requestId] = RequestStatus({
+            paid: VRF_V2_WRAPPER.calculateRequestPrice(callbackGasLimit),
+            fulfilled: false,
+            randomWords: new uint256[](0)
+        });
+        requestIds.push(requestId);
+        lastRequestId = requestId;
 
-        _nextTokenId++;
+        emit RequestSent(requestId, numRandomWords);
+    }
+
+    function fulfillRandomWords(
+        uint256 _requestId,
+        uint256[] memory _randomWords
+    ) internal override {
+        require(s_requests[_requestId].paid > 0, 'request not found');
+        s_requests[_requestId].fulfilled = true;
+        s_requests[_requestId].randomWords = _randomWords;
+        emit RequestFulfilled(
+            _requestId,
+            _randomWords,
+            s_requests[_requestId].paid
+        );
+    }
+
+    function getRequestStatus(
+        uint256 _requestId
+    )
+        external
+        view
+        returns (uint256 paid, bool fulfilled, uint256[] memory randomWords)
+    {
+        require(s_requests[_requestId].paid > 0, 'request not found');
+        RequestStatus memory request = s_requests[_requestId];
+        return (request.paid, request.fulfilled, request.randomWords);
     }
 
     function formatTokenURI(
@@ -52,9 +104,4 @@ contract NFT is ERC721URIStorage, VRFV2WrapperConsumerBase, Ownable {
             )
         );
     }
-
-    function fulfillRandomWords(
-        uint256 _requestId,
-        uint256[] memory _randomWords
-    ) internal override {}
 }

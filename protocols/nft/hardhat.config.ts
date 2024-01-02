@@ -1,5 +1,4 @@
-import '@nomicfoundation/hardhat-ignition-viem'
-import '@nomicfoundation/hardhat-toolbox-viem'
+import '@nomicfoundation/hardhat-toolbox'
 import { HardhatUserConfig, vars } from 'hardhat/config'
 
 const config: HardhatUserConfig = {
@@ -9,7 +8,7 @@ const config: HardhatUserConfig = {
   networks: {
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${vars.get(
-        'ALCHEMY_SEPOLIA_API_KEY',
+        'ALCHEMY_API_KEY',
       )}`,
       accounts: [vars.get('PRIVATE_KEY')],
     },
